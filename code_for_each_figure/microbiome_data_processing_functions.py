@@ -142,14 +142,12 @@ def normalize_data(subdata, otu_table, kingdom, taxonomy_level = 'species'):
 
 
 
-def get_baby_weights_and_drugs(baby, all_meds, all_weights):
-    
-    # weight data
+def get_baby_weights_and_drugs(baby, all_meds, all_weights=0):
+	# note we have removed weight data as not used in publication    
+
     individual_data = all_meds.loc[all_meds.id == baby, :]
     individual_data = individual_data.fillna(0)
-    individual_weight = all_weights.loc[all_weights.id == baby, :]
-    individual_weight = individual_weight.fillna(0)
-    max_day = int(max(max(individual_weight.pn_day), max(individual_data.pn_day)))
+    max_day = int(max(individual_data.pn_day))
 
     # meds data
     days_of_life = np.unique(individual_data.pn_day)
@@ -162,7 +160,7 @@ def get_baby_weights_and_drugs(baby, all_meds, all_weights):
         individual_drugs.loc[current_row.Med, current_row.pn_day] = 1
     individual_drugs = individual_drugs.fillna(0)
     
-    return(individual_weight, individual_drugs)
+    return(0, individual_drugs)
 
 
 

@@ -1,6 +1,9 @@
 # Author: Katharine Z. Coyte
 #
 # License: Apache License 2.0
+#
+# A set of functions for loading and restructuring data for subsequent analysis
+
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -188,118 +191,6 @@ def plot_baby_timeseries(normalized_data,
 
     return
 
-
-
-def plot_weights(individual_weight, max_day, cur_ax):
-
-    cur_ax.plot(individual_weight.pn_day, individual_weight.weight, 'o-')
-    cur_ax.set_title('Weight')
-    cur_ax.set_ylim([500,2500])
-
-    plt.xticks(np.arange(0, max_day, step=1))
-
-    return(cur_ax)
-
-
-
-def plot_drugs(individual_drugs, cur_ax, max_day):
-    antibacterials, antifungals, vaccines = di.load_drug_types()
-    individual_drugs = individual_drugs.loc[pd.concat([pd.DataFrame(antibacterials),pd.DataFrame(antifungals)])[0],:]
-
-    individual_drugs = individual_drugs.iloc[:,:int(max_day-0.5)]
-    individual_drugs = individual_drugs.drop(individual_drugs.loc[individual_drugs.sum(1)==0,:].index)
-
-    d_ix=0
-    for ix in individual_drugs.index:
-        cur_drug = individual_drugs.loc[ix,:]
-        cur_drug = pd.DataFrame(cur_drug.loc[cur_drug>0])
-        cur_ax.scatter(cur_drug.index, d_ix*cur_drug, marker = 's', s=40, c='gray')
-        d_ix=d_ix+1
-    cur_ax.set_yticks(range(0, len(individual_drugs.index)))
-    cur_ax.set_yticklabels(individual_drugs.index)
-    cur_ax.set_ylim([-0.5, len(individual_drugs.index)])
-    cur_ax.set_xlim([0, max_day])
-
-    return(cur_ax)
-
-
-
-
-def make_baby_figure(baby,
-                     data,
-                     otu_table,
-                     taxonomy_level,
-                     cutoff_threshold,
-                     all_meds,
-                     all_weights):
-
-
-    data_bacteria = process_NICU_data_for_plotting(data, otu_table, 'Bacteria', taxonomy_level)
-    data_fungi = process_NICU_data_for_plotting(data, otu_table, 'Fungi', taxonomy_level)
-    data_archaea = process_NICU_data_for_plotting(data, otu_table, 'Archaea', taxonomy_level)
-
-    lookup_baby = baby
-    if '_' in baby:
-        split_baby = baby.split('_')
-        lookup_baby = split_baby[0]
-    lookup_baby=int(lookup_baby)
-
-    individual_weight, individual_drugs = mdpf.get_baby_weights_and_drugs(lookup_baby, all_meds, all_weights)
-    max_day = int(max(max(individual_weight.pn_day),
-                      max(individual_drugs.columns),
-                      max(data_bacteria.day.astype(int))))+0.5
-    max_day = int(max(data_bacteria.day.astype(int)))+0.5
-
-    f = plt.figure(figsize=[22,25])
-    #f.subplots_adjust(hspace = .1, wspace=3)
-    f.subplots_adjust(left=0.2, bottom=None, right=0.8, top=None, wspace=3, hspace=0.1)
-
-
-    ax3 = f.add_subplot(513)
-    ax3.set_xlim([0, max_day])
-    ax1 = f.add_subplot(511, sharex=ax3)
-    ax2 = f.add_subplot(512, sharex=ax3)
-    ax4 = f.add_subplot(514, sharex=ax3)
-    ax5 = f.add_subplot(515, sharex=ax3)
-
-    ax1 = plot_drugs(individual_drugs, ax1, max_day)
-    ax5 = plot_weights(individual_weight, max_day, ax5)
-
-    plot_baby_timeseries(data_bacteria,
-                         otu_table,
-                         str(baby),
-                         taxonomy_level,
-                         100,
-                         'bacteria',
-                         ax2)
-    ax2.set_title('Bacteria')
-    #ax2.legend(bbox_to_anchor=(0.82, 1))
-
-
-    plot_baby_timeseries(data_fungi,
-                         otu_table,
-                         str(baby),
-                         taxonomy_level,
-                         10,
-                         'fungi',
-                         ax3)
-    ax3.set_title('Fungi')
-    ax3.legend(bbox_to_anchor=(0.0, 1))
-
-    plot_baby_timeseries(data_archaea,
-                         otu_table,
-                         str(baby),
-                         taxonomy_level,
-                         1,
-                         'archea',
-                         ax4)
-    ax4.set_title('Archaea')
-    #ax4.legend(bbox_to_anchor=(0.82, 1))
-
-    ax1.grid(True, alpha=0.35)
-    #plt.show()
-
-    return f
 
 
 def process_NICU_data_for_plotting(data, otu_table, kingdom, taxonomy_level):

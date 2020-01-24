@@ -205,17 +205,6 @@ def plot_baby_timeseries(normalized_data,
 
 
 
-def plot_weights(individual_weight, max_day, cur_ax):
-
-    cur_ax.plot(individual_weight.pn_day, individual_weight.weight, 'o-')
-    cur_ax.set_title('Weight')
-    cur_ax.set_ylim([500,2500])
-
-    plt.xticks(np.arange(0, max_day, step=1))
-
-    return(cur_ax)
-
-
 
 def plot_drugs(individual_drugs, cur_ax, max_day):
     antibacterials, antifungals, vaccines = di.load_drug_types()
@@ -264,7 +253,7 @@ def make_baby_figure(baby,
         lookup_baby = split_baby[0]
     lookup_baby=int(lookup_baby)
 
-    individual_weight, individual_drugs = mdpf.get_baby_weights_and_drugs(lookup_baby, all_meds, all_weights)
+    individual_weight, individual_drugs = mdpf.get_baby_weights_and_drugs(lookup_baby, all_meds, 0)
     max_day = int(max(data_bacteria.day.astype(int)))+0.5
 
     f = plt.figure(figsize=[22,25])
@@ -276,10 +265,8 @@ def make_baby_figure(baby,
     ax1 = f.add_subplot(511, sharex=ax3)
     ax2 = f.add_subplot(512, sharex=ax3)
     ax4 = f.add_subplot(514, sharex=ax3)
-    ax5 = f.add_subplot(515, sharex=ax3)
 
     ax1 = plot_drugs(individual_drugs, ax1, max_day)
-    ax5 = plot_weights(individual_weight, max_day, ax5)
 
     plot_baby_timeseries(data_bacteria,
                          otu_table,
