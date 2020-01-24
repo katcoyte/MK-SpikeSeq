@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sns
 
-import baby_color_tables as bct
+import color_tables as bct
 import microbiome_data_processing_functions as mdpf
 import drug_info as di
 
